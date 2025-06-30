@@ -1,0 +1,37 @@
+package com.example.studentrecordsystem.controller;
+
+import com.example.studentrecordsystem.dto.FacultyDTO;
+import com.example.studentrecordsystem.services.FacultyService;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
+@RestController
+@RequestMapping("/api/faculty")
+@CrossOrigin(origins = "http://localhost:5173")
+public class FacultyController {
+ 
+    private final FacultyService facultyService;
+
+    public FacultyController(FacultyService facultyService) {
+        this.facultyService = facultyService;
+    }  
+
+    @PostMapping
+    public FacultyDTO createFaculty(@RequestBody FacultyDTO dto) {
+        return facultyService.createFaculty(dto);
+    }
+
+    @GetMapping
+    public List<FacultyDTO> getAllFaculties() {
+        return facultyService.getAllFaculties();
+    }
+
+    @PostMapping("/login")
+    public FacultyDTO login(@RequestBody FacultyDTO dto) {
+        return facultyService.login(dto.getEmail(), dto.getPassword());
+    } 
+    
+    
+    
+}
