@@ -1,0 +1,5 @@
+package com.example.studentrecordsystem.services;
+
+public class FacultyService {
+
+}

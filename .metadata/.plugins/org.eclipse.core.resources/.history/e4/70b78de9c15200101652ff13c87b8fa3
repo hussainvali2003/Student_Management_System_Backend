@@ -1,0 +1,52 @@
+package com.example.studentrecordsystem.services;
+
+import com.example.studentrecordsystem.dto.FacultyDTO;
+import com.example.studentrecordsystem.models.Faculty;
+import com.example.studentrecordsystem.repository.FacultyRepository;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.stream.Collectors;
+
+@Service
+public class FacultyService {
+
+    private final FacultyRepository facultyRepository;
+
+    public FacultyService(FacultyRepository facultyRepository) {
+        this.facultyRepository = facultyRepository;
+    }
+
+    public FacultyDTO createFaculty(FacultyDTO dto) {
+        Faculty faculty = new Faculty();
+        faculty.setFirstName(dto.getFirstName());
+        faculty.setLastName(dto.getLastName());
+        faculty.setEmail(dto.getEmail());
+        faculty.setDepartment(dto.getDepartment());
+        faculty.setPassword(dto.getPassword());
+        faculty = facultyRepository.save(faculty);
+        return convertToDTO(faculty);
+    }
+
+    public List<FacultyDTO> getAllFaculties() {
+        return facultyRepository.findAll().stream().map(this::convertToDTO).collect(Collectors.toList());
+    }
+
+    public FacultyDTO login(String email, String password) {
+        Faculty faculty = facultyRepository.findByEmailAndPassword(email, password);
+        return faculty != null ? convertToDTO(faculty) : null;
+    }
+
+    private FacultyDTO convertToDTO(Faculty faculty) {
+        FacultyDTO dto = new FacultyDTO();
+        dto.setId(faculty.getId());
+        dto.setFirstName(faculty.getFirstName());
+        dto.setLastName(faculty.getLastName());
+        dto.setEmail(faculty.getEmail());
+        dto.setDepartment(faculty.getDepartment());
+        dto.setPassword(faculty.getPassword());
+        dto.setRole("FACULTY"); // Hardcoded or fetched if saved in DB
+        return dto;
+    }
+
+}

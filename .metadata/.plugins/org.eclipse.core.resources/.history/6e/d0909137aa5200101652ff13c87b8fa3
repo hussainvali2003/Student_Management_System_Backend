@@ -1,0 +1,5 @@
+package com.example.studentrecordsystem.config;
+
+public class WebConfig {
+
+}

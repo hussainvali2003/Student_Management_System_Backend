@@ -1,0 +1,113 @@
+package com.example.studentrecordsystem.services;
+
+import com.example.studentrecordsystem.dto.StudentDTO;
+import com.example.studentrecordsystem.models.Student;
+import com.example.studentrecordsystem.repository.StudentRepository;
+import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.List;
+import java.util.UUID;
+import java.util.stream.Collectors;
+
+@Service
+public class StudentService {
+
+    private final StudentRepository studentRepository;
+    private static final String UPLOAD_DIR = System.getProperty("user.dir") + "/uploads/";
+
+    public StudentService(StudentRepository studentRepository) {
+        this.studentRepository = studentRepository;
+    }
+
+    public List<StudentDTO> getAllStudents() {
+        return studentRepository.findAll().stream()
+                .map(this::convertToDTO)
+                .collect(Collectors.toList());
+    }
+
+    public StudentDTO getStudentById(Long id) {
+        Student student = studentRepository.findById(id).orElse(null);
+        return (student != null) ? convertToDTO(student) : null;
+    }
+
+    public StudentDTO createStudent(StudentDTO dto) {
+        Student student = convertToEntity(dto);
+        student = studentRepository.save(student);
+        return convertToDTO(student);
+    }
+
+    public StudentDTO updateStudent(Long id, StudentDTO dto) {
+        Student student = studentRepository.findById(id).orElse(null);
+        if (student == null) return null;
+
+        student.setFirstName(dto.getFirstName());
+        student.setLastName(dto.getLastName());
+        student.setEmail(dto.getEmail());
+        student.setDepartment(dto.getDepartment());
+        student.setPassword(dto.getPassword());
+        student.setProfilePicUrl(dto.getProfilePicUrl());
+
+        student = studentRepository.save(student);
+        return convertToDTO(student);
+    }
+
+    public void deleteStudent(Long id) {
+        studentRepository.deleteById(id);
+    }
+
+    public StudentDTO login(String email, String password) {
+        Student student = studentRepository.findByEmailAndPassword(email, password);
+        return (student != null) ? convertToDTO(student) : null;
+    }
+
+    public String uploadProfilePic(Long studentId, MultipartFile file) throws IOException {
+        Student student = studentRepository.findById(studentId).orElse(null);
+        if (student == null) return null;
+
+        // Ensure upload directory exists
+        File uploadDir = new File(UPLOAD_DIR);
+        if (!uploadDir.exists()) {
+            uploadDir.mkdirs();
+        }
+
+        String fileName = UUID.randomUUID() + "_" + file.getOriginalFilename();
+        File dest = new File(uploadDir, fileName);
+        file.transferTo(dest);
+
+        student.setProfilePicUrl(fileName);
+        studentRepository.save(student);
+
+        return fileName;
+    }
+
+
+    private StudentDTO convertToDTO(Student student) {
+        StudentDTO dto = new StudentDTO(
+                student.getId(),
+                student.getFirstName(),
+                student.getLastName(),
+                student.getEmail(),
+                student.getDepartment(),
+                student.getPassword()
+        );
+        dto.setProfilePicUrl(student.getProfilePicUrl());
+        dto.setRole("STUDENT");
+        return dto;
+    }
+
+    private Student convertToEntity(StudentDTO dto) {
+        Student student = new Student(
+                dto.getId(),
+                dto.getFirstName(),
+                dto.getLastName(),
+                dto.getEmail(),
+                dto.getDepartment(),
+                dto.getPassword()
+        );
+        student.setProfilePicUrl(dto.getProfilePicUrl());
+        return student;
+    }
+}

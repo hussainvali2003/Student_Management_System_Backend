@@ -1,0 +1,76 @@
+package com.example.studentrecordsystem.services;
+
+import com.example.studentrecordsystem.dto.*;
+import com.example.studentrecordsystem.models.*;
+import com.example.studentrecordsystem.repository.*;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.stream.Collectors;
+
+@Service
+public class StudentDashboardService {
+
+    @Autowired private StudentRepository studentRepository;
+    @Autowired private EnrollmentRepository enrollmentRepository;
+    @Autowired private GradeRepository gradeRepository;
+    @Autowired private AttendanceRepository attendanceRepository;
+
+    // ✅ This method was missing!
+    public StudentDTO getStudentProfile(Long studentId) {
+        Student student = studentRepository.findById(studentId).orElse(null);
+        if (student == null) return null;
+
+        return new StudentDTO(
+                student.getId(),
+                student.getFirstName(),
+                student.getLastName(),
+                student.getEmail(),
+                student.getDepartment(),
+                student.getPassword()
+   
+        );
+    }
+    
+    public List<StudentCourseInfoDTO> getStudentCourseInfo(Long studentId) {
+        return enrollmentRepository.findStudentCourseInfoByStudentId(studentId);
+    }
+
+    public List<CourseDTO> getEnrolledCourses(Long studentId) {
+        return enrollmentRepository.findByStudentId(studentId)
+                .stream()
+                .map(e -> new CourseDTO(
+                        e.getCourse().getId(),
+                        e.getCourse().getCourseCode(),
+                        e.getCourse().getCourseName(),
+                        e.getCourse().getCredit()
+                ))
+                .collect(Collectors.toList());
+    }
+
+    public List<GradeDTO> getGrades(Long studentId) {
+        return gradeRepository.findByStudentId(studentId)
+                .stream()
+                .map(g -> new GradeDTO(
+                        g.getId(),
+                        g.getGrade(),
+                        g.getStudent().getId(),
+                        g.getCourse().getId()
+                ))
+                .collect(Collectors.toList());
+    }
+
+    public List<AttendanceDTO> getAttendance(Long studentId) {
+        return attendanceRepository.findByStudentId(studentId)
+                .stream()
+                .map(a -> new AttendanceDTO(
+                        a.getId(),
+                        a.getDate(),
+                        a.getStatus(),
+                        a.getStudent().getId(),
+                        a.getCourse().getId()
+                ))
+                .collect(Collectors.toList());
+    }
+}

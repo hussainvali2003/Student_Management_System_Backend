@@ -1,0 +1,53 @@
+package com.example.studentrecordsystem.controller;
+ 
+import org.springframework.web.bind.annotation.*;
+
+import com.example.studentrecordsystem.dto.GradeDTO;
+import com.example.studentrecordsystem.dto.GradeDetailsDTO;
+import com.example.studentrecordsystem.services.GradeService;
+
+import java.util.List;
+
+@RestController
+@RequestMapping("/api/grades")
+@CrossOrigin(origins = "http://localhost:5173")
+public class GradeController {
+
+    private final GradeService gradeService;
+
+    public GradeController(GradeService gradeService) {
+        this.gradeService = gradeService;
+    }
+
+    @GetMapping
+    public List<GradeDTO> getAllGrades() {
+        return gradeService.getAllGrades();
+    }
+
+    @GetMapping("/{id}")
+    public GradeDTO getGradeById(@PathVariable Long id) {
+        return gradeService.getGradeById(id);
+    }
+
+    @PostMapping
+    public GradeDTO createGrade(@RequestBody GradeDTO dto) {
+        return gradeService.createGrade(dto);
+    }
+
+    @PutMapping("/{id}")
+    public GradeDTO updateGrade(@PathVariable Long id, @RequestBody GradeDTO dto) {
+        return gradeService.updateGrade(id, dto);
+    }
+
+    @DeleteMapping("/{id}")
+    public void deleteGrade(@PathVariable Long id) { 
+        gradeService.deleteGrade(id);
+    }
+    @GetMapping("/details")
+    public List<GradeDetailsDTO> getStudentGradeDetails(@RequestParam Long studentId) {
+        return gradeService.getDetailedGradesForStudent(studentId);
+    }
+}
+
+
+

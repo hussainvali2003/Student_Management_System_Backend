@@ -1,0 +1,43 @@
+package com.example.studentrecordsystem.controller;
+ 
+import com.example.studentrecordsystem.dto.*;
+import com.example.studentrecordsystem.services.StudentDashboardService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
+@RestController
+@RequestMapping("/api/student")
+@CrossOrigin(origins = "http://localhost:5173")
+public class StudentDashboardController {
+
+    @Autowired
+    private StudentDashboardService dashboardService;
+
+    @GetMapping("/me")
+    public StudentDTO getMyProfile(@RequestParam Long studentId) {
+        return dashboardService.getStudentProfile(studentId);
+    }
+
+    @GetMapping("/my-courses")
+    public List<CourseDTO> getMyCourses(@RequestParam Long studentId) {
+        return dashboardService.getEnrolledCourses(studentId);
+    }
+
+    @GetMapping("/my-grades")
+    public List<GradeDTO> getMyGrades(@RequestParam Long studentId) {
+        return dashboardService.getGrades(studentId);
+    }
+
+    @GetMapping("/my-attendance")
+    public List<AttendanceDTO> getMyAttendance(@RequestParam Long studentId) {
+        return dashboardService.getAttendance(studentId);
+    }
+    @GetMapping("/enrollment-details")
+    public List<StudentCourseInfoDTO> getEnrollmentDetails(@RequestParam Long studentId) {
+        return dashboardService.getStudentCourseInfo(studentId);
+    }
+
+}
+

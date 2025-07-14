@@ -1,0 +1,5 @@
+package com.example.studentrecordsystem.repository;
+
+public interface FacultyRepository {
+
+}
